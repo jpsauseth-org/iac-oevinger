@@ -10,7 +10,7 @@ terraform {
     }
   }
 }
-
+#funket dette?
 provider "azurerm" {
   features {}
 
