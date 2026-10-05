@@ -17,6 +17,10 @@ on:
         type: string
         required: true
 
+concurrency:
+  group: webapp-${{ inputs.environment }}
+  cancel-in-progress: false
+
 jobs:
   bekreft:
     runs-on: ubuntu-latest
@@ -36,6 +40,10 @@ jobs:
     needs: bekreft
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: read
     # … resten av jobben
     defaults:
       run:
@@ -48,7 +56,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       TF_INPUT: false
       TF_IN_AUTOMATION: true
-      MILJO: ${{ inputs.environment || 'dev' }}
+      MILJO: ${{ inputs.environment }}
 
     steps:
       - name: Hent koden
@@ -70,6 +78,12 @@ jobs:
             --vault-name "${{ secrets.KEYVAULT_NAME }}" \
             --name "tfvars-webapp-${{ env.MILJO }}" \
             --query value -o tsv > params.auto.tfvars
+          
+      - name: Init
+        run: |
+          terraform init \
+            -backend-config="${{ github.workspace }}/oppgave-4/shared/backend.hcl" \
+            -backend-config="key=env/${{ env.MILJO }}/webapp.tfstate"
 
       - name: Lag en destroy-plan
         run: terraform plan -destroy -out=tfdestroy
