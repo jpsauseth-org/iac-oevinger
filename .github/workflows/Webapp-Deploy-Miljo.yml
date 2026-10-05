@@ -1,4 +1,4 @@
-name: Rull ut rg – velg miljø
+name: Rull ut webapp – velg miljø
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ permissions:
 
 # To kjøringer mot samme miljø venter på hverandre, men dev og test kan gå samtidig.
 concurrency:
-  group: rg-${{ inputs.environment }}
+  group: webapp-${{ inputs.environment }}
   cancel-in-progress: false
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: modul-5.1/rg
+        working-directory: modul-5.2/stacks/webapp
 
     env:
       ARM_USE_OIDC: true
@@ -53,14 +53,14 @@ jobs:
         run: |
           az keyvault secret show \
             --vault-name "${{ secrets.KEYVAULT_NAME }}" \
-            --name "tfvars-${{ inputs.environment }}" \
+            --name "tfvars-webapp-${{ inputs.environment }}" \
             --query value -o tsv > params.auto.tfvars
 
       - name: Init
         run: |
           terraform init \
             -backend-config="${{ github.workspace }}/oppgave-4/shared/backend.hcl" \
-            -backend-config="key=env/${{ inputs.environment }}/rg.tfstate"
+            -backend-config="key=env/${{ inputs.environment }}/webapp.tfstate"
 
       - name: Validate
         run: terraform validate
