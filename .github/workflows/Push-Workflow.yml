@@ -21,7 +21,7 @@ permissions:
 
 # To kjøringer mot samme miljø venter på hverandre, men dev og test kan gå samtidig.
 concurrency:
-  group: webapp-${{ inputs.environment }}
+  group: webapp-${{ inputs.environment || 'dev' }}
   cancel-in-progress: false
 
 jobs:
