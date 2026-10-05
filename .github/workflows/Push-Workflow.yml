@@ -27,7 +27,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: ${{ inputs.environment || 'dev' }}
 
     defaults:
       run:
@@ -40,6 +40,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       TF_INPUT: false
       TF_IN_AUTOMATION: true
+      MILJO: ${{ inputs.environment || 'dev' }}
 
     steps:
       - name: Hent koden
@@ -59,14 +60,14 @@ jobs:
         run: |
           az keyvault secret show \
             --vault-name "${{ secrets.KEYVAULT_NAME }}" \
-            --name "tfvars-webapp-${{ inputs.environment }}" \
+            --name "tfvars-webapp-${{ env.MILJO }}" \
             --query value -o tsv > params.auto.tfvars
 
       - name: Init
         run: |
           terraform init \
             -backend-config="${{ github.workspace }}/oppgave-4/shared/backend.hcl" \
-            -backend-config="key=env/${{ inputs.environment }}/webapp.tfstate"
+            -backend-config="key=env/${{ env.MILJO }}/webapp.tfstate"
 
       - name: Validate
         run: terraform validate
@@ -76,6 +77,20 @@ jobs:
 
       - name: Apply
         run: terraform apply -auto-approve
+
+      - name: Verifiser at appen svarer
+        run: |
+          URL=$(terraform output -raw webapp_url)
+          for i in $(seq 1 10); do
+            if curl -fsS --max-time 10 "https://$URL" > /dev/null; then
+              echo "Appen svarer på https://$URL"
+              exit 0
+            fi
+            echo "Forsøk $i: ikke oppe ennå, venter…"
+            sleep 15
+          done
+          echo "Appen svarte ikke innen tidsfristen"
+          exit 1
 
       - name: Slett parameterfila
         if: always()
