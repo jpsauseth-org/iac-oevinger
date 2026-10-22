@@ -2,27 +2,27 @@ variable "shortname" {
   type        = string
   description = "Ditt eget kortnavn. Går inn i alle ressursnavn."
 }
- 
+
 variable "project" {
   type        = string
   description = "Prosjektnavn, del av navnegrunnlaget."
 }
- 
+
 variable "environment" {
   type        = string
   description = "Miljønavn: dev, test eller prod."
 }
- 
+
 variable "location" {
   type        = string
   description = "Azure-regionen ressursene opprettes i."
 }
- 
+
 variable "vm_size" {
   type        = string
   description = "VM-SKU. Se lista over tillatte SKU-er i oppgaven."
 }
- 
+
 variable "vm_subnet_key" {
   type        = string
   description = <<-TEKST
@@ -30,13 +30,13 @@ variable "vm_subnet_key" {
     Slås opp i mapet fra nettverks-stacken: subnet_ids["app"].
   TEKST
 }
- 
+
 variable "admin_username" {
   type        = string
   default     = "tfadmin"
   description = "Lokal administratorbruker på maskinen."
 }
- 
+
 variable "admin_password" {
   type        = string
   sensitive   = true
@@ -48,7 +48,7 @@ variable "admin_password" {
     containeren er privat og rollene er satt.
   TEKST
 }
- 
+
 # ---------------------------------------------------------------------------
 #  Backend-adressen til den ANDRE stacken.
 #
@@ -60,18 +60,18 @@ variable "backend_resource_group_name" {
   type        = string
   description = "Ressursgruppa state-lagringen ligger i. Fra backend-bootstrap."
 }
- 
+
 variable "backend_storage_account_name" {
   type        = string
   description = "Storage account-et state-filene ligger i. Fra backend-bootstrap."
 }
- 
+
 variable "backend_container_name" {
   type        = string
   default     = "tfstate"
   description = "Containeren state-filene ligger i."
 }
- 
+
 variable "nettverk_state_key" {
   type        = string
   description = <<-TEKST
@@ -79,7 +79,7 @@ variable "nettverk_state_key" {
     Ikke å forveksle med app-stackens egen key, som settes ved init.
   TEKST
 }
- 
+
 variable "subscription_id" {
   type        = string
   default     = null

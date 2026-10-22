@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'iac-oevinger/**'
+      - 'modul-5.2/**'
       - '.github/workflows/pr-kontroller.yml'
 
 permissions:
@@ -25,9 +25,9 @@ jobs:
         run: terraform fmt -check -recursive
 
       - name: Klargjør providere uten backend
-        working-directory: iac-oevinger/modul-5.2/stacks/webapp
+        working-directory: modul-5.2/stacks/webapp
         run: terraform init -backend=false
 
       - name: Valider koden
-        working-directory: iac-oevinger/modul-5.2/stacks/webapp
+        working-directory: modul-5.2/stacks/webapp
         run: terraform validate

@@ -1,25 +1,25 @@
 variable "base_name" {
-  type    = string
+  type = string
 }
 
 variable "rg_name" {
-  type    = string
+  type = string
 }
 
 variable "location" {
-  type    = string
+  type = string
 }
 
 variable "admin_un" {
-  type    = string
+  type = string
 }
 
 variable "admin_ps" {
-  type    = string
+  type = string
 }
 
 variable "pc_name" {
-  type    = string
+  type = string
 }
 
 variable "tags" {
