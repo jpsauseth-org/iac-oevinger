@@ -4,7 +4,8 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'terraform-projects/**'
+      - 'modul-5.2/**'
+      - '.github/workflows/pr-plan.yml'
 
 permissions:
   id-token: write
@@ -22,7 +23,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: terraform-projects/stacks/webapp
+        working-directory: modul-5.2/stacks/webapp
 
     env:
       ARM_USE_OIDC: true
@@ -39,6 +40,7 @@ jobs:
       - name: Installer Terraform
         uses: hashicorp/setup-terraform@v3
         with:
+          terraform_version: 1.16.0
           terraform_wrapper: false
 
       - name: Logg inn i Azure
@@ -52,13 +54,13 @@ jobs:
         run: |
           az keyvault secret show \
             --vault-name "${{ secrets.KEYVAULT_NAME }}" \
-            --name "tfvars-dev" \
+            --name "tfvars-webapp-dev" \
             --query value -o tsv > params.auto.tfvars
 
       - name: Init
         run: |
           terraform init \
-            -backend-config="${{ github.workspace }}/terraform-projects/shared/backend.hcl" \
+            -backend-config="${{ github.workspace }}/oppgave-4/shared/backend.hcl" \
             -backend-config="key=env/dev/webapp.tfstate"
 
       - name: Plan

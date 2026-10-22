@@ -16,14 +16,14 @@ permissions:
   id-token: write
   contents: read
 
-plan-prod:
-    needs: apply
+jobs:
+  plan:
     runs-on: ubuntu-latest
-    environment: prod-plan
+    environment: ${{ inputs.plan_miljo }}
 
     defaults:
       run:
-        working-directory: terraform-projects/stacks/webapp
+        working-directory: modul-5.2/stacks/webapp
 
     env:
       ARM_USE_OIDC: true
@@ -39,6 +39,8 @@ plan-prod:
 
       - name: Installer Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.0
 
       - name: Logg inn i Azure
         uses: Azure/login@v3.1.0
@@ -47,18 +49,18 @@ plan-prod:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Hent parameterfila for prod
+      - name: Hent parameterfila for ${{ inputs.miljo }}
         run: |
           az keyvault secret show \
             --vault-name "${{ secrets.KEYVAULT_NAME }}" \
-            --name "tfvars-prod" \
+            --name "tfvars-webapp-${{ inputs.miljo }}" \
             --query value -o tsv > params.auto.tfvars
 
       - name: Init
         run: |
           terraform init \
-            -backend-config="${{ github.workspace }}/terraform-projects/shared/backend.hcl" \
-            -backend-config="key=env/prod/webapp.tfstate"
+            -backend-config="${{ github.workspace }}/oppgave-4/shared/backend.hcl" \
+            -backend-config="key=env/${{ inputs.miljo }}/webapp.tfstate"
 
       - name: Plan
         run: terraform plan -out=tfplan
@@ -66,56 +68,58 @@ plan-prod:
       - name: Ta vare på planen
         uses: actions/upload-artifact@v7
         with:
-          name: tfplan-prod-${{ github.sha }}
-          path: terraform-projects/stacks/webapp/tfplan
+          name: tfplan-${{ inputs.miljo }}-${{ github.sha }}
+          path: modul-5.2/stacks/webapp/tfplan
           retention-days: 5
 
       - name: Slett parameterfila
         if: always()
         run: rm -f params.auto.tfvars
 
-    apply-prod:
-      needs: plan-prod
-      runs-on: ubuntu-latest
-      environment: prod
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.miljo }}
 
-      defaults:
-        run:
-          working-directory: terraform-projects/stacks/webapp
+    defaults:
+      run:
+        working-directory: modul-5.2/stacks/webapp
 
-      env:
-        ARM_USE_OIDC: true
-        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        TF_INPUT: false
-        TF_IN_AUTOMATION: true
+    env:
+      ARM_USE_OIDC: true
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_INPUT: false
+      TF_IN_AUTOMATION: true
 
-      steps:
-        - name: Hent koden
-          uses: actions/checkout@v5
+    steps:
+      - name: Hent koden
+        uses: actions/checkout@v5
 
-        - name: Installer Terraform
-          uses: hashicorp/setup-terraform@v3
+      - name: Installer Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.0
 
-        - name: Logg inn i Azure
-          uses: Azure/login@v3.1.0
-          with:
-            client-id: ${{ secrets.AZURE_CLIENT_ID }}
-            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Logg inn i Azure
+        uses: Azure/login@v3.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-        - name: Hent planen
-          uses: actions/download-artifact@v8
-          with:
-            name: tfplan-prod-${{ github.sha }}
-            path: terraform-projects/stacks/webapp
+      - name: Hent planen
+        uses: actions/download-artifact@v8
+        with:
+          name: tfplan-${{ inputs.miljo }}-${{ github.sha }}
+          path: modul-5.2/stacks/webapp
 
-        - name: Init
-          run: |
-            terraform init \
-              -backend-config="${{ github.workspace }}/terraform-projects/shared/backend.hcl" \
-              -backend-config="key=env/prod/webapp.tfstate"
+      - name: Init
+        run: |
+          terraform init \
+            -backend-config="${{ github.workspace }}/oppgave-4/shared/backend.hcl" \
+            -backend-config="key=env/${{ inputs.miljo }}/webapp.tfstate"
 
-        - name: Apply
-          run: terraform apply tfplan
+      - name: Apply
+        run: terraform apply tfplan
