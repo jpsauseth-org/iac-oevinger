@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'modul-5.2/**'
+      - 'terraform-projects/**'
       - '.github/workflows/**'
 
 permissions:
@@ -25,9 +25,9 @@ jobs:
         run: terraform fmt -check -recursive
 
       - name: Klargjør providere uten backend
-        working-directory: modul-5.2/stacks/webapp
+        working-directory: terraform-projects/stacks/webapp
         run: terraform init -backend=false
 
       - name: Valider koden
-        working-directory: modul-5.2/stacks/webapp
+        working-directory: terraform-projects/stacks/webapp
         run: terraform validate

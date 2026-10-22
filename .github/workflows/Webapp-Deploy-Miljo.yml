@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'modul-5.2/**'
+      - 'terraform-projects/**'
       - '.github/workflows/Webapp-Deploy-Miljo.yml'
       - '.github/workflows/terraform-env.yml'
 

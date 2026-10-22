@@ -23,7 +23,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: modul-5.2/stacks/webapp
+        working-directory: terraform-projects/stacks/webapp
 
     env:
       ARM_USE_OIDC: true
@@ -59,7 +59,7 @@ jobs:
       - name: Init
         run: |
           terraform init \
-            -backend-config="${{ github.workspace }}/oppgave-4/shared/backend.hcl" \
+            -backend-config="${{ github.workspace }}/terraform-projects/shared/backend.hcl" \
             -backend-config="key=env/${{ inputs.miljo }}/webapp.tfstate"
 
       - name: Plan
@@ -69,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: tfplan-${{ inputs.miljo }}-${{ github.sha }}
-          path: modul-5.2/stacks/webapp/tfplan
+          path: terraform-projects/stacks/webapp/tfplan
           retention-days: 5
 
       - name: Slett parameterfila
@@ -83,7 +83,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: modul-5.2/stacks/webapp
+        working-directory: terraform-projects/stacks/webapp
 
     env:
       ARM_USE_OIDC: true
@@ -113,12 +113,12 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: tfplan-${{ inputs.miljo }}-${{ github.sha }}
-          path: modul-5.2/stacks/webapp
+          path: terraform-projects/stacks/webapp
 
       - name: Init
         run: |
           terraform init \
-            -backend-config="${{ github.workspace }}/oppgave-4/shared/backend.hcl" \
+            -backend-config="${{ github.workspace }}/terraform-projects/shared/backend.hcl" \
             -backend-config="key=env/${{ inputs.miljo }}/webapp.tfstate"
 
       - name: Apply
