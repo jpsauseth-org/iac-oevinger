@@ -12,14 +12,14 @@ resource "azurerm_network_security_group" "nsg" {
   name                = format("nsg-%s", lower(var.base_name))
   location            = format(lower(var.location))
   resource_group_name = var.rg_name
-  tags = var.tags
+  tags                = var.tags
 }
 
 resource "azurerm_virtual_network" "vnet" {
   name                = format("vnet-%s", lower(var.base_name))
   location            = format(lower(var.location))
   resource_group_name = var.rg_name
-  tags = var.tags
+  tags                = var.tags
   address_space       = ["10.0.0.0/16"]
 }
 

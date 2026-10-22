@@ -1,6 +1,6 @@
 terraform {
   required_version = ">= 1.5.0"
- 
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -8,7 +8,7 @@ terraform {
     }
   }
 }
- 
+
 provider "azurerm" {
   features {}
   subscription_id = var.subscription_id
@@ -16,7 +16,7 @@ provider "azurerm" {
 
 data "terraform_remote_state" "nettverk" {
   backend = "azurerm"
- 
+
   config = {
     resource_group_name  = var.backend_resource_group_name
     storage_account_name = var.backend_storage_account_name
@@ -25,10 +25,10 @@ data "terraform_remote_state" "nettverk" {
     use_azuread_auth     = true
   }
 }
- 
+
 locals {
   base_name = lower(format("%s-%s-%s", var.project, var.environment, var.shortname))
- 
+
   tags = {
     environment = var.environment
     owner       = var.shortname
@@ -37,7 +37,7 @@ locals {
     managedby   = "terraform"
   }
 
-    subnet_id = data.terraform_remote_state.nettverk.outputs.subnet_ids[var.vm_subnet_key]
+  subnet_id = data.terraform_remote_state.nettverk.outputs.subnet_ids[var.vm_subnet_key]
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -48,7 +48,7 @@ resource "azurerm_resource_group" "rg" {
 
 module "compute" {
   source = "../../../modules/compute"
- 
+
   rg_name        = azurerm_resource_group.rg.name
   location       = var.location
   base_name      = local.base_name
@@ -56,7 +56,7 @@ module "compute" {
   admin_username = var.admin_username
   admin_password = var.admin_password
   tags           = local.tags
- 
+
   # Ingen ID skrevet inn. Grep etter /subscriptions/ i denne mappa skal gi
   # null treff – det er K8.
   subnet_id = local.subnet_id

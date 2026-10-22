@@ -8,13 +8,13 @@ terraform {
 }
 
 provider "azurerm" {
-      features {}
+  features {}
 }
 
 module "resource-group" {
-    source      = "./resource-group"
-    base_name   = "TFDemo"
-    location    = "Norway East"
+  source    = "./resource-group"
+  base_name = "TFDemo"
+  location  = "Norway East"
 }
 
 module "storage-account" {

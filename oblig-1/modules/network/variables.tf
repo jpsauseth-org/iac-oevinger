@@ -1,20 +1,20 @@
 variable "base_name" {
-  type = string
+  type        = string
   description = "hoved navn for alle resurser"
 }
 
 variable "rg_name" {
-  type = string
+  type        = string
   description = "navn for ressurs grupper"
 }
 
 variable "location" {
-  type = string
+  type        = string
   description = "lokasjon forklarer (westeurope)"
 }
 
 variable "address_space" {
-  type = string
+  type        = string
   description = "adresser å ta fra med cidr"
 }
 
@@ -33,6 +33,6 @@ variable "subnets" {
 }
 
 variable "tags" {
-  type = map(string)
+  type        = map(string)
   description = "forklarende merkelapper"
 }
